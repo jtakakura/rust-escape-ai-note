@@ -1,4 +1,4 @@
-use escape::*;
+use escape::{resources::init_resources, *};
 use macroquad::prelude::*;
 
 fn window_conf() -> Conf {
@@ -13,6 +13,8 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    init_resources().await;
+
     loop {
         let (r, g, b, a) = WINDOW_BACKGROUND_COLOR;
         clear_background(Color::from_rgba(r, g, b, a));
