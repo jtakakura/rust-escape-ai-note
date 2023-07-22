@@ -1,6 +1,10 @@
 use macroquad::{prelude::*, rand::gen_range};
 
-use crate::{level::LevelInfo, *};
+use crate::{
+    agent::{Agent, AgentCommand},
+    level::LevelInfo,
+    *,
+};
 
 #[derive(Clone)]
 pub struct Game {
@@ -11,6 +15,7 @@ pub struct Game {
     pub is_complete: bool,
     pub is_dead: bool,
 
+    agent: Agent,
     moves: Vec<u8>,
 
     // Steps it took to complete key and door step
@@ -23,6 +28,8 @@ impl Game {
         let resources = RESOURCES.get().unwrap();
         let lvl = resources.lvl_info.clone();
         Self {
+            agent: Agent::new(),
+
             // At last to avoid borrow error
             lvl,
 
@@ -46,7 +53,11 @@ impl Game {
         Self::with_moves(&parent.moves)
     }
 
-    pub fn update(&mut self, _frame_count: usize) {
+    pub fn get_current_agent_pos(&self) -> &(usize, usize) {
+        &self.agent.pos
+    }
+
+    pub fn update(&mut self, frame_count: usize) {
         if self.is_complete {
             return;
         }
@@ -61,6 +72,12 @@ impl Game {
         if !self.is_key_collected {
             self.num_key_steps += 1;
         }
+
+        let command = AgentCommand::from_int(*self.moves.get(frame_count).unwrap_or(&0));
+        self.agent.update(command, self.is_key_collected);
+
+        self.handle_key_collision();
+        self.is_complete = self.check_player_at_door();
     }
 
     pub fn fitness(&mut self, ff_key: &usize, ff_door: &usize) -> f32 {
@@ -87,6 +104,11 @@ impl Game {
         self.fitness
     }
 
+    pub fn update_manual(&mut self, command: AgentCommand) {
+        self.moves[0] = command.to_int();
+        self.update(0);
+    }
+
     pub fn crossover(first: &Self, second: &Self) -> Self {
         let split_point = gen_range(0, first.moves.len());
         let mut new_moves = Vec::from_iter(first.moves[0..split_point].iter().cloned());
@@ -101,6 +123,25 @@ impl Game {
         }
 
         Game::with_moves(&new_moves)
+    }
+
+    fn check_player_at_door(&self) -> bool {
+        let (x, y) = self.agent.pos;
+        let (dx, dy) = self.lvl.door;
+
+        x == dx && y == dy
+    }
+
+    fn handle_key_collision(&mut self) {
+        if self.is_key_collected {
+            return;
+        }
+
+        let (x, y) = self.agent.pos;
+        let (a, b) = self.lvl.key;
+        if x == a && y == b {
+            self.is_key_collected = true;
+        }
     }
 
     pub fn draw(&self, offset_x: f32, offset_y: f32) {
@@ -145,6 +186,11 @@ impl Game {
                     ..Default::default()
                 },
             );
+        }
+
+        if !self.is_dead {
+            // Draw agent, on top of other sprites
+            self.agent.draw(scale_factor, offset_x, offset_y);
         }
     }
 }
