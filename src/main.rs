@@ -1,4 +1,4 @@
-use escape::{resources::init_resources, *};
+use escape::{game::Game, resources::init_resources, *};
 use macroquad::prelude::*;
 
 fn window_conf() -> Conf {
@@ -15,9 +15,17 @@ fn window_conf() -> Conf {
 async fn main() {
     init_resources().await;
 
+    let mut frame_count: usize = 0;
+
+    let mut game = Game::new();
+
     loop {
         let (r, g, b, a) = WINDOW_BACKGROUND_COLOR;
         clear_background(Color::from_rgba(r, g, b, a));
+        frame_count += 1;
+
+        game.update(frame_count);
+        game.draw(0.0, 0.0);
 
         if is_key_pressed(KeyCode::Escape) {
             break;
