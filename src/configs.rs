@@ -5,6 +5,7 @@ pub const WINDOW_WIDTH: u32 = 1920;
 pub const WINDOW_HEIGHT: u32 = 1080;
 
 /// Agent & Game
+pub const IS_PLAY_SLEEP_ANIMATION: bool = false;
 pub const MUTATION_PROBABILITY: f32 = 10.0;
 pub const FF_WEIGHT_THRESHOLD: f32 = 100000.0;
 
