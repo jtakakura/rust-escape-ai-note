@@ -75,6 +75,7 @@ name = "escape"
 version = "0.1.0"
 dependencies = [
  "macroquad",
+ "macroquad-tiled",
 ]
 
 [[package]]
@@ -158,6 +159,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "macroquad-tiled"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9119b056e57e2b3d16183cefb20a0f79f56b0805f6e18b724a66ad03fae11275"
+dependencies = [
+ "macroquad",
+ "nanoserde",
+]
+
+[[package]]
 name = "macroquad_macro"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -193,6 +204,21 @@ dependencies = [
  "adler",
  "simd-adler32",
 ]
+
+[[package]]
+name = "nanoserde"
+version = "0.1.33"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "efd70383f6928f4cc1df3736278cd4e7ea467e8c6848336b36ecdf0a89f38666"
+dependencies = [
+ "nanoserde-derive",
+]
+
+[[package]]
+name = "nanoserde-derive"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86b53c5a09a773c60df71fa6f41b8631f80a3406e6766e7f5ee773b2ec419e08"
 
 [[package]]
 name = "ndk-sys"
