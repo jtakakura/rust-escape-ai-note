@@ -1,0 +1,150 @@
+use macroquad::{prelude::*, rand::gen_range};
+
+use crate::{level::LevelInfo, *};
+
+#[derive(Clone)]
+pub struct Game {
+    pub lvl: LevelInfo,
+    pub fitness: f32,
+
+    pub is_key_collected: bool,
+    pub is_complete: bool,
+    pub is_dead: bool,
+
+    moves: Vec<u8>,
+
+    // Steps it took to complete key and door step
+    num_key_steps: u32,
+    num_door_steps: u32,
+}
+
+impl Game {
+    pub fn new() -> Self {
+        let resources = RESOURCES.get().unwrap();
+        let lvl = resources.lvl_info.clone();
+        Self {
+            // At last to avoid borrow error
+            lvl,
+
+            fitness: 0.0,
+            is_key_collected: false,
+            is_complete: false,
+            is_dead: false,
+            moves: (0..NUM_FRAMES).map(|_| gen_range(0, 4)).collect(),
+            num_key_steps: 0,
+            num_door_steps: 0,
+        }
+    }
+
+    pub fn with_moves(moves: &Vec<u8>) -> Self {
+        let mut g = Self::new();
+        g.moves = moves.clone();
+        g
+    }
+
+    pub fn clone_with_moves(parent: &Game) -> Self {
+        Self::with_moves(&parent.moves)
+    }
+
+    pub fn update(&mut self, _frame_count: usize) {
+        if self.is_complete {
+            return;
+        }
+
+        if self.is_dead {
+            self.num_door_steps = NUM_FRAMES as u32;
+            self.num_key_steps = NUM_FRAMES as u32;
+            return;
+        }
+
+        self.num_door_steps += 1;
+        if !self.is_key_collected {
+            self.num_key_steps += 1;
+        }
+    }
+
+    pub fn fitness(&mut self, ff_key: &usize, ff_door: &usize) -> f32 {
+        if self.is_complete {
+            let key_val = NUM_FRAMES as f32 - self.num_key_steps as f32 + 1.0;
+            let door_val = NUM_FRAMES as f32 - self.num_door_steps as f32 + 1.0;
+            self.fitness = key_val * 20.0 + door_val * 20.0 + FF_WEIGHT_THRESHOLD * 2.0;
+            return self.fitness;
+        }
+
+        if !self.is_key_collected {
+            self.fitness = (1.0 / *ff_key as f32) * 1000.0;
+            return self.fitness;
+        }
+
+        let f_key = 10.0 + (NUM_FRAMES as f32 / self.num_key_steps as f32);
+        let f_door = (1.0 / *ff_door as f32) * 1000.0;
+        self.fitness = f_key + f_door;
+
+        if self.is_key_collected {
+            self.fitness += 1000.0;
+        }
+
+        self.fitness
+    }
+
+    pub fn crossover(first: &Self, second: &Self) -> Self {
+        let split_point = gen_range(0, first.moves.len());
+        let mut new_moves = Vec::from_iter(first.moves[0..split_point].iter().cloned());
+        new_moves.extend_from_slice(&second.moves[split_point..]);
+
+        for m in new_moves.iter_mut() {
+            if gen_range(0.0, 1.0) > (MUTATION_PROBABILITY as f32) * 0.001 {
+                continue;
+            }
+
+            *m = gen_range(0, 4);
+        }
+
+        Game::with_moves(&new_moves)
+    }
+
+    pub fn draw(&self, offset_x: f32, offset_y: f32) {
+        let resources = RESOURCES.get().unwrap();
+        let textures = TEXTURES.get().unwrap();
+        let scale_factor = UNIT_FRAME_SIZE * FRAME_SCALE;
+        let w = self.lvl.size.0 as f32 * scale_factor;
+        let h = self.lvl.size.1 as f32 * scale_factor;
+
+        // Draw level background image
+        let background_tint = match self.is_complete {
+            true => Color::from_rgba(116, 242, 145, 255),
+            false => WHITE,
+        };
+        draw_texture_ex(
+            &resources.lvl_background_sprite,
+            offset_x,
+            offset_y,
+            background_tint,
+            DrawTextureParams {
+                dest_size: Some((w, h).into()),
+                ..Default::default()
+            },
+        );
+
+        // Draw door
+        if !self.is_key_collected {
+            resources
+                .lvl_map
+                .draw_tiles(LAYER_DOOR, Rect::new(offset_x, offset_y, w, h), None);
+        }
+
+        // Draw keys
+        if !self.is_key_collected {
+            draw_texture_ex(
+                &textures.key_texture,
+                self.lvl.key.0 as f32 * scale_factor + offset_x,
+                self.lvl.key.1 as f32 * scale_factor + offset_y,
+                WHITE,
+                DrawTextureParams {
+                    dest_size: Some(Vec2::splat(scale_factor)),
+                    ..Default::default()
+                },
+            );
+        }
+    }
+}

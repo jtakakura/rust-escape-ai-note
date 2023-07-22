@@ -4,6 +4,15 @@ pub const IS_FULL_SCREEN: bool = true;
 pub const WINDOW_WIDTH: u32 = 1920;
 pub const WINDOW_HEIGHT: u32 = 1080;
 
+/// Agent & Game
+pub const MUTATION_PROBABILITY: f32 = 10.0;
+pub const FF_WEIGHT_THRESHOLD: f32 = 100000.0;
+
+/// Simulation
+pub const NUM_FRAMES: usize = 200;
+pub const UNIT_FRAME_SIZE: f32 = 4.0;
+pub const FRAME_SCALE: f32 = 10.0;
+
 /// Resources
 pub const TILESET_PATH: &str = "tiled/tileset.png";
 pub const TILE_SET_NAME: &str = "tileset.png";

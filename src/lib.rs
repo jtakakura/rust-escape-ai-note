@@ -1,4 +1,5 @@
 pub mod configs;
+pub mod game;
 pub mod level;
 pub mod resources;
 
