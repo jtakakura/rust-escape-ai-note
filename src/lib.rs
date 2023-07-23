@@ -1,6 +1,7 @@
 pub mod agent;
 pub mod configs;
 pub mod editor;
+pub mod ff;
 pub mod game;
 pub mod level;
 pub mod population;
