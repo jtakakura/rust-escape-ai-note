@@ -11,6 +11,8 @@ pub const FF_WEIGHT_THRESHOLD: f32 = 100000.0;
 
 /// Simulation
 pub const NUM_FRAMES: usize = 200;
+pub const NUM_GAMES_IN_ROW: u32 = 35;
+pub const NUM_GAMES: u32 = 1020;
 pub const UNIT_FRAME_SIZE: f32 = 4.0;
 pub const FRAME_SCALE: f32 = 10.0;
 

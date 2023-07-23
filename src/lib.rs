@@ -3,6 +3,7 @@ pub mod configs;
 pub mod editor;
 pub mod game;
 pub mod level;
+pub mod population;
 pub mod resources;
 pub mod simulation;
 
