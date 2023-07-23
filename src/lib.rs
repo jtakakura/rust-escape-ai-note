@@ -1,5 +1,6 @@
 pub mod agent;
 pub mod configs;
+pub mod editor;
 pub mod game;
 pub mod level;
 pub mod resources;
