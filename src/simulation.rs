@@ -1,9 +1,9 @@
 use macroquad::prelude::*;
 
-use crate::{editor::Editor, game::Game, NUM_FRAMES};
+use crate::{editor::Editor, population::Population, NUM_FRAMES};
 
 pub struct Simulation {
-    game: Game,
+    population: Population,
     frame_count: usize,
     generation_count: u32,
 }
@@ -16,7 +16,7 @@ pub struct SimulationStats {
 impl Simulation {
     pub fn new() -> Self {
         Self {
-            game: Game::new(),
+            population: Population::new(),
             frame_count: 0,
             generation_count: 1,
         }
@@ -27,7 +27,7 @@ impl Simulation {
             return None;
         }
 
-        self.game.update(self.frame_count);
+        self.population.update(self.frame_count, editor);
         self.frame_count += 1;
 
         if self.frame_count >= NUM_FRAMES && editor.settings.is_ai_enabled {
@@ -41,7 +41,7 @@ impl Simulation {
     }
 
     fn start_new_generation(&mut self, _is_selection: bool) {
-        self.game = Game::new();
+        self.population = Population::new();
 
         self.frame_count = 0;
         self.generation_count += 1;
@@ -52,7 +52,7 @@ impl Simulation {
             return;
         }
 
-        self.game.draw(0.0, 0.0);
+        self.population.draw(editor);
     }
 }
 
