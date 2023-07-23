@@ -40,8 +40,12 @@ impl Simulation {
         })
     }
 
-    fn start_new_generation(&mut self, _is_selection: bool) {
-        self.population = Population::new();
+    fn start_new_generation(&mut self, is_selection: bool) {
+        if is_selection {
+            self.population.selection();
+        } else {
+            self.population = Population::new();
+        }
 
         self.frame_count = 0;
         self.generation_count += 1;

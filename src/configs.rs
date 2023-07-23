@@ -8,6 +8,8 @@ pub const WINDOW_HEIGHT: u32 = 1080;
 pub const IS_PLAY_SLEEP_ANIMATION: bool = false;
 pub const MUTATION_PROBABILITY: f32 = 10.0;
 pub const FF_WEIGHT_THRESHOLD: f32 = 100000.0;
+pub const POP_RETENTION_RATE: f32 = 5.0;
+pub const POP_EXPO_PERCENTAGE: f32 = 10.0;
 
 /// Simulation
 pub const NUM_FRAMES: usize = 200;
